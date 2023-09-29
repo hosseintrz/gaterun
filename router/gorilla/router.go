@@ -2,6 +2,7 @@ package gorilla
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"log/slog"
@@ -68,7 +69,7 @@ func (r gorillaRouter) registerEndpoint(endpoint *config.EndpointConfig, handler
 	case http.MethodGet, http.MethodPost, http.MethodPut, http.MethodPatch, http.MethodDelete:
 		r.cfg.Router.HandleFunc(path, handler).Methods(method)
 	default:
-		slog.Error("unsupported http method: %s", method)
+		slog.Error(fmt.Sprintf("unsupported http method: %v", method))
 		return
 	}
 
