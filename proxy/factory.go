@@ -39,3 +39,9 @@ func NewFactory(backendProxyFactory BackendProxyFactory) Factory {
 func NewDefaultFactory() Factory {
 	return NewFactory(httpProxy)
 }
+
+func NoOpProxyFactory() Factory {
+	return NewFactory(func(_ *config.BackendConfig) Proxy {
+		return NoopProxy
+	})
+}
