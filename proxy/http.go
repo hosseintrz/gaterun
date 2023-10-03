@@ -23,7 +23,9 @@ func CustomHTTPProxyFactory(cf client.HTTPClientFactory) BackendProxyFactory {
 }
 
 func NewHTTPProxy(cfg *config.BackendConfig, cf client.HTTPClientFactory) Proxy {
-	return NewHTTPProxyWithHTTPExecutor(cfg, client.DefaultHTTPReqeustExecutor(cf), encoding.NewDecoderFactory(cfg.DecoderFactory))
+	// return NewHTTPProxyWithHTTPExecutor(cfg, client.DefaultHTTPReqeustExecutor(cf), encoding.NewDecoderFactory(cfg.DecoderFactory))
+	return NewHTTPProxyWithHTTPExecutor(cfg, client.DefaultHTTPReqeustExecutor(cf), encoding.CustomDecoderFactory)
+
 }
 
 func NewHTTPProxyWithHTTPExecutor(cfg *config.BackendConfig, requestExecutor client.HTTPRequestExecutor, decoderFactory encoding.DecoderFactory) Proxy {

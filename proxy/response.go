@@ -27,7 +27,7 @@ func NewDefaultHTTPResponseParser(decoderFactory encoding.DecoderFactory) HTTPRe
 		defer res.Body.Close()
 
 		data := make(map[string]interface{})
-		decoder := decoderFactory()
+		decoder := decoderFactory(res.Header)
 		// decoder := json.NewDecoder(res.Body)
 		if err := decoder.Decode(res.Body, &data); err != nil {
 			return nil, err

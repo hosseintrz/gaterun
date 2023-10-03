@@ -14,7 +14,6 @@ type HandlerFactory func(*config.EndpointConfig, proxy.Proxy) http.HandlerFunc
 func NewHandlerFactory(rb proxy.RequestBuilder) HandlerFactory {
 	return func(ec *config.EndpointConfig, prxy proxy.Proxy) http.HandlerFunc {
 		method := ec.Method
-		responseWrapper := NewResponseWrapper(ec.OutputEncoding)
 
 		return func(rw http.ResponseWriter, req *http.Request) {
 			rw.Header().Set("GATERUN", "1.0")
@@ -45,6 +44,8 @@ func NewHandlerFactory(rb proxy.RequestBuilder) HandlerFactory {
 					rw.Header().Add(key, val)
 				}
 			}
+
+			responseWrapper := NewResponseWrapper(resp.Metadata.Headers, ec.OutputEncoding)
 
 			responseWrapper(rw, resp)
 		}
