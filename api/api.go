@@ -11,5 +11,5 @@ func ServeApi() {
 	adminApi := r.Group("/admin")
 	admin.AddRoutes(adminApi)
 
-	r.Run("http://localhost:8001")
+	r.Run("127.0.0.1:8001")
 }

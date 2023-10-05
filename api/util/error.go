@@ -38,3 +38,7 @@ func UnAuthorizedError(message string, baseErr error) *HTTPError {
 func ForbiddenError(message string, baseErr error) *HTTPError {
 	return NewHTTPError(http.StatusForbidden, message, baseErr)
 }
+
+func InvalidRequestError(message string, baseErr error) *HTTPError {
+	return NewHTTPError(http.StatusBadRequest, message, baseErr)
+}

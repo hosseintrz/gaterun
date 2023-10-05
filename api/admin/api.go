@@ -36,7 +36,7 @@ func addConsumerRoutes(r *gin.RouterGroup) {
 
 		id, err := util.Int64Param(c, "id")
 		if err != nil {
-			util.WriteError(c, err)
+			util.WriteError(c, util.NewHTTPError(http.StatusBadRequest, "invalid param id", err))
 			return
 		}
 
@@ -57,7 +57,7 @@ func addConsumerRoutes(r *gin.RouterGroup) {
 
 		id, err := util.Int64Param(c, "id")
 		if err != nil {
-			util.WriteError(c, err)
+			util.WriteError(c, util.NewHTTPError(http.StatusBadRequest, "invalid param id", err))
 			return
 		}
 
@@ -70,7 +70,7 @@ func addConsumerRoutes(r *gin.RouterGroup) {
 
 		id, err := util.Int64Param(c, "id")
 		if err != nil {
-			util.WriteError(c, err)
+			util.WriteError(c, util.NewHTTPError(http.StatusBadRequest, "invalid param id", err))
 			return
 		}
 
@@ -80,7 +80,7 @@ func addConsumerRoutes(r *gin.RouterGroup) {
 			return
 		}
 
-		err = updateConsumer(ctx, id, &consumer)
-		util.WriteJSON(c, util.ResponseOk(nil), err)
+		res, err := updateConsumer(ctx, id, &consumer)
+		util.WriteJSON(c, util.ResponseOk(res), err)
 	})
 }
