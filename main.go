@@ -1,28 +1,18 @@
 package main
 
 import (
-	"flag"
-	"log"
+	"os"
 
-	"github.com/hosseintrz/gaterun/config"
-	"github.com/hosseintrz/gaterun/proxy"
-	"github.com/hosseintrz/gaterun/router/gorilla"
+	"github.com/hosseintrz/gaterun/cmd"
+	log "github.com/sirupsen/logrus"
 )
 
 func main() {
-	port := flag.Int("p", 7800, "Port of the service")
-	configFile := flag.String("c", "./config.json", "Path to the configuration filename")
-	flag.Parse()
+	log.SetOutput(os.Stdout)
+	log.Info("hererer")
+	rootCmd := cmd.NewRootCmd()
 
-	serviceConfig, err := config.Parse(*configFile)
-	if err != nil {
-		log.Fatal("ERROR:", err.Error())
+	if err := rootCmd.Execute(); err != nil {
+		log.WithError(err).Fatal("Could not run command")
 	}
-
-	if *port != 0 {
-		serviceConfig.Port = *port
-	}
-
-	routerFactory := gorilla.DefaultFactory(proxy.NewDefaultFactory())
-	routerFactory.New().Run(serviceConfig)
 }
