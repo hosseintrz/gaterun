@@ -3,13 +3,17 @@ package database
 import (
 	"context"
 	"fmt"
+	"log"
+	"os"
 	"sync"
+	"time"
 
 	"errors"
 
 	"github.com/hosseintrz/gaterun/config"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 var (
@@ -25,10 +29,24 @@ func InitDatabase(cfg config.DatabaseConfig) error {
 	once.Do(func() {
 		dsn := getDSN(cfg)
 
+		newLogger := logger.New(
+			log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
+			logger.Config{
+				SlowThreshold:             time.Second, // Slow SQL threshold
+				LogLevel:                  logger.Info, // Log level
+				IgnoreRecordNotFoundError: true,        // Ignore ErrRecordNotFound error for logger
+				ParameterizedQueries:      true,        // Don't include params in the SQL log
+				Colorful:                  false,       // Disable color
+			},
+		)
+
 		db, err = gorm.Open(postgres.New(postgres.Config{
 			DSN:                  dsn,
 			PreferSimpleProtocol: true, // disables implicit prepared statement usage
-		}), &gorm.Config{})
+		}), &gorm.Config{
+			Logger: newLogger,
+		})
+
 	})
 
 	if err != nil {

@@ -8,7 +8,7 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/hosseintrz/gaterun/transport/http/server"
+	"github.com/hosseintrz/gaterun/pkg/transport/http/server"
 )
 
 type Request struct {

@@ -5,7 +5,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/hosseintrz/gaterun/encoding"
+	"github.com/hosseintrz/gaterun/pkg/encoding"
 )
 
 type Metadata struct {

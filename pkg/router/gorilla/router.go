@@ -11,7 +11,7 @@ import (
 	"github.com/hosseintrz/gaterun/config"
 	"github.com/hosseintrz/gaterun/pkg/proxy"
 	"github.com/hosseintrz/gaterun/pkg/router"
-	"github.com/hosseintrz/gaterun/transport/http/server"
+	"github.com/hosseintrz/gaterun/pkg/transport/http/server"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 )

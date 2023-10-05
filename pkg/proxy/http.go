@@ -6,8 +6,8 @@ import (
 	"strconv"
 
 	"github.com/hosseintrz/gaterun/config"
-	"github.com/hosseintrz/gaterun/encoding"
-	"github.com/hosseintrz/gaterun/transport/http/client"
+	"github.com/hosseintrz/gaterun/pkg/encoding"
+	"github.com/hosseintrz/gaterun/pkg/transport/http/client"
 )
 
 var httpProxy = CustomHTTPProxyFactory(client.DefaultHttpClientFactory{})
