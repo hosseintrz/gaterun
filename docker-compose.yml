@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: gaterun_postgres
+    environment:
+      POSTGRES_DB: ${PG_DATABASE:-gaterun}
+      POSTGRES_USER: ${PG_USERNAME:-postgres}
+      POSTGRES_PASSWORD: ${PG_PASSWORD:-pass1234}
+    ports:
+      - "5432:5432"
