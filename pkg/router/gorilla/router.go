@@ -9,8 +9,8 @@ import (
 
 	gorilla "github.com/gorilla/mux"
 	"github.com/hosseintrz/gaterun/config"
-	"github.com/hosseintrz/gaterun/proxy"
-	"github.com/hosseintrz/gaterun/router"
+	"github.com/hosseintrz/gaterun/pkg/proxy"
+	"github.com/hosseintrz/gaterun/pkg/router"
 	"github.com/hosseintrz/gaterun/transport/http/server"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"

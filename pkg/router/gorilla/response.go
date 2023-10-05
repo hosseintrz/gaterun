@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/hosseintrz/gaterun/proxy"
+	"github.com/hosseintrz/gaterun/pkg/proxy"
 )
 
 const (

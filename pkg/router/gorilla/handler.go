@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/hosseintrz/gaterun/config"
-	"github.com/hosseintrz/gaterun/proxy"
+	"github.com/hosseintrz/gaterun/pkg/proxy"
 )
 
 type HandlerFactory func(*config.EndpointConfig, proxy.Proxy) http.HandlerFunc
