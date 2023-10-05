@@ -22,3 +22,13 @@ func Parse(configPath string) (cfg ServiceConfig, err error) {
 
 	return
 }
+
+// func ReadConfig(configPath string) (v *viper.Viper, err error) {
+// 	v = viper.New()
+// 	v.SetConfigFile(configPath)
+// 	if err = viper.ReadInConfig(); err != nil {
+// 		return
+// 	}
+
+// 	return
+// }
