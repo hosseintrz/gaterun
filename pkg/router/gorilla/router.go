@@ -12,6 +12,7 @@ import (
 	"github.com/hosseintrz/gaterun/pkg/proxy"
 	"github.com/hosseintrz/gaterun/pkg/router"
 	"github.com/hosseintrz/gaterun/pkg/transport/http/server"
+	log "github.com/sirupsen/logrus"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 )
@@ -73,7 +74,7 @@ func (r gorillaRouter) registerEndpoint(endpoint *config.EndpointConfig, handler
 		return
 	}
 
-	slog.Info("registering endpoint", "method", method, "path", path)
+	log.Infof("registering endpoint {method=%s - path=%s}", method, path)
 }
 
 type factory struct {

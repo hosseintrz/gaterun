@@ -10,8 +10,8 @@ import (
 	"time"
 
 	"github.com/hosseintrz/gaterun/config"
-	"github.com/hosseintrz/gaterun/proxy"
-	"github.com/hosseintrz/gaterun/router/gorilla"
+	"github.com/hosseintrz/gaterun/pkg/proxy"
+	"github.com/hosseintrz/gaterun/pkg/router/gorilla"
 )
 
 func TestDefaultRouter(t *testing.T) {

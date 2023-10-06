@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/hosseintrz/gaterun/api/util"
+	"github.com/hosseintrz/gaterun/pkg/api/util"
 	"github.com/hosseintrz/gaterun/pkg/database"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"

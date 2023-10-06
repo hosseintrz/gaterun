@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/hosseintrz/gaterun/api/util"
+	"github.com/hosseintrz/gaterun/pkg/api/util"
 )
 
 func AddRoutes(r *gin.RouterGroup) {
