@@ -4,8 +4,8 @@ import (
 	"flag"
 	"log"
 
-	"github.com/hosseintrz/gaterun/api"
 	"github.com/hosseintrz/gaterun/config"
+	"github.com/hosseintrz/gaterun/pkg/api"
 )
 
 func Start() {

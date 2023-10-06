@@ -3,7 +3,7 @@ package cmd
 import (
 	"context"
 
-	"github.com/hosseintrz/gaterun/api"
+	"github.com/hosseintrz/gaterun/pkg/api"
 	"github.com/hosseintrz/gaterun/pkg/gateway"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"

@@ -38,6 +38,6 @@ func initDatabase() {
 
 	err := database.InitDatabase(dbCfg)
 	if err != nil {
-		log.WithError(err).Error("couldn't initialize database")
+		log.WithError(err).Error("couldn't connect to database")
 	}
 }
