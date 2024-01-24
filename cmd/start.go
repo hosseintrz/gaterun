@@ -5,7 +5,6 @@ import (
 	"log"
 
 	"github.com/hosseintrz/gaterun/config"
-	"github.com/hosseintrz/gaterun/pkg/api"
 )
 
 func Start() {
@@ -22,9 +21,9 @@ func Start() {
 		serviceConfig.Port = *port
 	}
 
-	go func() {
-		api.ServeApi()
-	}()
+	// go func() {
+	// 	api.ServeApi()
+	// }()
 
 	// routerFactory := gorilla.DefaultFactory(proxy.NewDefaultFactory())
 	// routerFactory.New().Run(serviceConfig)
