@@ -6,6 +6,15 @@ service_config:
   timeout: "4s"
   host: localhost
   router: gorilla
+  health_check: true
+  auth_type: apikey
+  rate_limit:
+    domain: service
+    interval: 1m
+    threshold: 6
+    scope: 1
+    target: 1
+    algorithm: 3
   endpoints:
     - endpoint: "/github"
       method: GET
@@ -13,20 +22,21 @@ service_config:
         - host: "https://api.github.com"
           url_pattern: "/"
           method: GET
-          allow:
+          allow_list:
             - authorizations_url
             - code_search_url
       timeout: "30s"
       output_encoding: "application/json"
-    - endpoint: "/users/{id}"
+    - endpoint: "/users2/{id}"
       method: GET
       backends:
         - host: "http://127.0.0.1:9000"
           url_pattern: "/users/{id}"
           method: GET
-          allow:
+          allow_list:
             - some
             - what
+          concurrent_calls: 1
       timeout: "30s"
       output_encoding: "application/json"
     - endpoint: "/users/{id}"
@@ -35,7 +45,7 @@ service_config:
         - host: "http://127.0.0.1:9000"
           url_pattern: "/users/{id}"
           method: PUT
-          allow:
+          allow_list:
             - some
             - what
       timeout: "30s"
@@ -46,7 +56,7 @@ service_config:
         - host: "http://127.0.0.1:9000"
           url_pattern: "/users"
           method: POST
-          allow:
+          allow_list:
             - some
             - what
       timeout: "30s"
@@ -57,7 +67,7 @@ service_config:
         - host: "http://127.0.0.1:9000"
           url_pattern: "/users/{id}"
           method: DELETE
-          allow:
+          allow_list:
             - some
             - what
       timeout: "30s"
@@ -74,9 +84,14 @@ database:
   type: "postgres"
   host: "127.0.0.1"
   port: 5432
-  timeout: 5000
+  timeout: 5500
   db_name: "gaterun"
   username: "postgres"
-  password: 
+  password: "pass1234"
   ssl_mode: "disable"
   schema:
+
+redis:
+  address: "localhost:6379"
+  password: "pass1234"
+  db: 0

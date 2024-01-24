@@ -1,0 +1,107 @@
+{
+    "version": 3,
+    "name": "gaterun api-gateway",
+    "port": 8000,
+    "cache_ttl": "3000s",
+    "timeout": "4s",
+    "host": "localhost",
+    "endpoints": [
+        {
+            "endpoint": "/github",
+            "method": "GET",
+            "backends": [
+                {
+                    "host": "https://api.github.com",
+                    "url_pattern": "/",
+                    "method": "GET",
+                    "allow": [
+                        "authorizations_url",
+                        "code_search_url"
+                    ]
+                }
+            ],
+            "timeout": "30s",
+            "output_encoding": "application/json"
+        },
+        {
+            "endpoint": "/users/{id}",
+            "method": "GET",
+            "backends": [
+                {
+                    "host": "http://127.0.0.1:9000",
+                    "url_pattern": "/users/{id}",
+                    "method": "GET",
+                    "allow": [
+                        "some",
+                        "what"
+                    ]
+                }
+            ],
+            "timeout": "30s",
+            "output_encoding": "application/json"
+        },
+        {
+            "endpoint": "/users/{id}",
+            "method": "PUT",
+            "backends": [
+                {
+                    "host": "http://127.0.0.1:9000",
+                    "url_pattern": "/users/{id}",
+                    "method": "PUT",
+                    "allow": [
+                        "some",
+                        "what"
+                    ]
+                }
+            ],
+            "timeout": "30s",
+            "output_encoding": "application/json"
+        },
+        {
+            "endpoint": "/users",
+            "method": "POST",
+            "backends": [
+                {
+                    "host": "http://127.0.0.1:9000",
+                    "url_pattern": "/users",
+                    "method": "POST",
+                    "allow": [
+                        "some",
+                        "what"
+                    ]
+                }
+            ],
+            "timeout": "30s",
+            "output_encoding": "application/json"
+        },
+        {
+            "endpoint": "/users/{id}",
+            "method": "DELETE",
+            "backends": [
+                {
+                    "host": "http://127.0.0.1:9000",
+                    "url_pattern": "/users/{id}",
+                    "method": "DELETE",
+                    "allow": [
+                        "some",
+                        "what"
+                    ]
+                }
+            ],
+            "timeout": "30s",
+            "output_encoding": "application/json"
+        },
+        {
+            "endpoint": "/hello-world",
+            "method": "GET",
+            "backends": [
+                {
+                    "host": "http://127.0.0.1:9000",
+                    "url_pattern": "/hello-world",
+                    "method": "GET"
+                }
+            ],
+            "timeout": "30s"
+        }
+    ]
+}

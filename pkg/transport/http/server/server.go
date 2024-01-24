@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/hosseintrz/gaterun/config"
+	"github.com/hosseintrz/gaterun/config/models"
 )
 
 const (
@@ -16,7 +16,7 @@ var (
 	UserAgentHeader = []string{GateRunUserAgent}
 )
 
-func RunServer(ctx context.Context, cfg config.ServiceConfig, handler http.Handler) error {
+func RunServer(ctx context.Context, cfg models.ServiceConfig, handler http.Handler) error {
 	errChan := make(chan error)
 	s := NewServer(cfg, handler)
 
@@ -32,7 +32,7 @@ func RunServer(ctx context.Context, cfg config.ServiceConfig, handler http.Handl
 	}
 }
 
-func NewServer(cfg config.ServiceConfig, handler http.Handler) *http.Server {
+func NewServer(cfg models.ServiceConfig, handler http.Handler) *http.Server {
 	return &http.Server{
 		Addr:              fmt.Sprintf("%s:%d", cfg.Host, cfg.Port),
 		Handler:           handler,
