@@ -3,100 +3,40 @@ package database
 import (
 	"context"
 	"fmt"
-	"log"
-	"os"
-	"sync"
-	"time"
 
-	"errors"
-
-	"github.com/hosseintrz/gaterun/config"
-	"gorm.io/driver/postgres"
+	"github.com/hosseintrz/gaterun/config/models"
+	"github.com/hosseintrz/gaterun/pkg/database/cassandra"
+	"github.com/hosseintrz/gaterun/pkg/database/postgres"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 )
 
-var (
-	ErrNilDatabase = errors.New("db is nil")
-)
+var dbType string
 
-var once sync.Once
-var db *gorm.DB
+// type Database interface {
+// 	InitDatabase(cfg config.DatabaseConfig) error
+// }
 
-func InitDatabase(cfg config.DatabaseConfig) error {
-	var err error
-
-	once.Do(func() {
-		dsn := getDSN(cfg)
-
-		newLogger := logger.New(
-			log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
-			logger.Config{
-				SlowThreshold:             time.Second, // Slow SQL threshold
-				LogLevel:                  logger.Info, // Log level
-				IgnoreRecordNotFoundError: true,        // Ignore ErrRecordNotFound error for logger
-				ParameterizedQueries:      true,        // Don't include params in the SQL log
-				Colorful:                  false,       // Disable color
-			},
-		)
-
-		db, err = gorm.Open(postgres.New(postgres.Config{
-			DSN:                  dsn,
-			PreferSimpleProtocol: true, // disables implicit prepared statement usage
-		}), &gorm.Config{
-			Logger: newLogger,
-		})
-
-	})
-
-	if err != nil {
-		return err
-		//		slog.Error("error initializing database -> %v\n", err)
+func InitDB(cfg models.DatabaseConfig) error {
+	switch cfg.Type {
+	case "postgres":
+		postgres.InitDatabase(cfg)
+	case "cassandra":
+		cassandra.InitDatabase(cfg)
+	default:
+		return fmt.Errorf("invalid database type")
 	}
 
-	return nil
-}
+	dbType = string(cfg.Type)
 
-func getDSN(cfg config.DatabaseConfig) string {
-	return fmt.Sprintf(
-		"user=%s password=%s dbname=%s port=%d sslmode=%s TimeZone=Asia/Tehran",
-		cfg.Username,
-		cfg.Password,
-		cfg.DbName,
-		cfg.Port,
-		cfg.SslMode,
-	)
+	return nil
 }
 
 func GetDB(ctx context.Context) (*gorm.DB, error) {
-	if db == nil {
-		return nil, ErrNilDatabase
+	switch dbType {
+	case "postgres":
+		return postgres.GetDB(ctx)
+	default:
+		return nil, fmt.Errorf("db not implemented")
 	}
 
-	return db.WithContext(ctx), nil
-}
-
-func ExecTx(db *gorm.DB, txFunc func(*gorm.DB) error) error {
-	tx := db.Begin()
-	if tx.Error != nil {
-		return tx.Error
-	}
-
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
-			panic(r)
-		} else if tx.Error != nil {
-			tx.Rollback()
-		} else {
-			tx.Commit()
-		}
-	}()
-
-	err := txFunc(tx)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
