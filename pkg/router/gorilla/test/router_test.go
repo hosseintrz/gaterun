@@ -18,7 +18,7 @@ func TestDefaultRouter(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	defaultPort := 8888
+	defaultPort := 9000
 
 	cfg := models.ServiceConfig{
 		Name: "test-models",
@@ -49,7 +49,7 @@ func TestDefaultRouter(t *testing.T) {
 				Timeout: 5,
 			},
 			{
-				Endpoint: "/user/{id}",
+				Endpoint: "/users/{id}",
 				Method:   "PATCH",
 				Backends: []*models.BackendConfig{
 					{},

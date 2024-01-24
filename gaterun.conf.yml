@@ -27,7 +27,7 @@ service_config:
             - code_search_url
       timeout: "30s"
       output_encoding: "application/json"
-    - endpoint: "/users2/{id}"
+    - endpoint: "/users/{id}"
       method: GET
       backends:
         - host: "http://127.0.0.1:9000"
