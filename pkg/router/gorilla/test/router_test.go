@@ -77,7 +77,8 @@ func TestDefaultRouter(t *testing.T) {
 	time.Sleep(5 * time.Millisecond)
 
 	for _, endpoint := range cfg.Endpoints {
-		req, err := http.NewRequest(strings.ToTitle(endpoint.Method), fmt.Sprintf("http://localhost:%d%s", defaultPort, endpoint.Endpoint), http.NoBody)
+		url := fmt.Sprintf("http://localhost:%d%s", defaultPort, endpoint.Endpoint)
+		req, err := http.NewRequest(strings.ToTitle(endpoint.Method), url, http.NoBody)
 		if err != nil {
 			t.Errorf("error creating http request: %v\n", err)
 			return
@@ -105,14 +106,14 @@ func TestDefaultRouter(t *testing.T) {
 		}
 
 		if cType := res.Header.Get("Content-Type"); cType != "application/json" {
-			t.Errorf("epxected application/json contentType but got: %s\n", cType)
+			t.Errorf("epxected application/json contentType but got: %s - addr: %s \n", cType, url)
 		}
 		if gateRunVersion := res.Header.Get("GATERUN"); gateRunVersion != "1.0" {
-			t.Errorf("expected gaterun version to be 1 but got %s\n", gateRunVersion)
+			t.Errorf("expected gaterun version to be 1 but got %s - addr : %s\n", gateRunVersion, url)
 		}
 
 		if res.StatusCode != http.StatusOK {
-			t.Errorf("expected statusCode to be 200 but got %d\n", res.StatusCode)
+			t.Errorf("expected statusCode to be 200 but got %d - addr: %s\n", res.StatusCode, url)
 		}
 	}
 
