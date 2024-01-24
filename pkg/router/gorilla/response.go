@@ -2,6 +2,7 @@ package gorilla
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"strings"
@@ -14,7 +15,7 @@ const (
 	PlainText       = "text/plain"
 )
 
-type ResponseWrapper func(rw http.ResponseWriter, res *proxy.Response)
+type ResponseWrapper func(rw *http.ResponseWriter, res *proxy.Response) ([]byte, error)
 
 func NewResponseWrapper(headers map[string][]string, outputEncoding string) ResponseWrapper {
 	encoding := outputEncoding
@@ -49,68 +50,54 @@ func getContentType(headers map[string][]string) string {
 	return strings.TrimSpace(contentType)
 }
 
-func JsonWrapper(rw http.ResponseWriter, res *proxy.Response) {
-	status := res.Metadata.StatusCode
-	rw.WriteHeader(status)
-
+func JsonWrapper(rw *http.ResponseWriter, res *proxy.Response) (response []byte, err error) {
 	//rw.Header().Set("Content-Type", "application/json")
 	if res == nil {
-		rw.Write([]byte{})
 		return
 	}
 
-	jsonData, err := json.Marshal(res.Data)
+	response, err = json.Marshal(res.Data)
 	if err != nil {
-		http.Error(rw, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	rw.Write(jsonData)
+	return response, nil
 }
-func StringWrapper(rw http.ResponseWriter, res *proxy.Response) {
-	status := res.Metadata.StatusCode
-	rw.WriteHeader(status)
 
+func StringWrapper(rw *http.ResponseWriter, res *proxy.Response) (response []byte, err error) {
 	//rw.Header().Set("Content-Type", "text/plain")
 	if res == nil {
-		rw.Write([]byte{})
+		err = fmt.Errorf("response is nil")
 		return
 	}
 
 	content, ok := res.Data["content"]
 	if !ok {
-		rw.Write([]byte{})
+		err = fmt.Errorf("content in response doesn't exists")
 		return
 	}
 
 	strContent, ok := content.(string)
 	if !ok {
-		rw.Write([]byte{})
+		err = fmt.Errorf("invalid repsonse type, not string")
 		return
 	}
 
-	rw.Write([]byte(strContent))
+	response = []byte(strContent)
+	return
 }
 
-func NoopWrapper(rw http.ResponseWriter, res *proxy.Response) {
+func NoopWrapper(rw *http.ResponseWriter, res *proxy.Response) (response []byte, err error) {
 	if res == nil {
-		rw.Write([]byte{})
+		err = fmt.Errorf("response is nil")
 		return
-	}
-
-	for key, values := range res.Metadata.Headers {
-		for _, val := range values {
-			rw.Header().Add(key, val)
-		}
-	}
-
-	if res.Metadata.StatusCode != 0 {
-		rw.WriteHeader(res.Metadata.StatusCode)
 	}
 
 	if res.Io == nil {
+		err = fmt.Errorf("IO is nil")
 		return
 	}
 
-	io.Copy(rw, res.Io)
+	io.Copy((*rw), res.Io)
+	return nil, nil
 }

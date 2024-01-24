@@ -8,7 +8,7 @@ import (
 	"log/slog"
 
 	gorilla "github.com/gorilla/mux"
-	"github.com/hosseintrz/gaterun/config"
+	"github.com/hosseintrz/gaterun/config/models"
 	"github.com/hosseintrz/gaterun/pkg/proxy"
 	"github.com/hosseintrz/gaterun/pkg/router"
 	"github.com/hosseintrz/gaterun/pkg/transport/http/server"
@@ -18,6 +18,11 @@ import (
 )
 
 // type MiddlewareFunc func(http.Handler) http.Handler
+
+// func init() {
+
+// 	admin.RegisterEndpointCallback(restartRouter)
+// }
 
 type Config struct {
 	Router         *gorilla.Router
@@ -30,26 +35,33 @@ type Config struct {
 type gorillaRouter struct {
 	cfg          Config
 	ctx          context.Context
+	cancelCtx    context.CancelFunc
 	serverRunner router.ServerRunnerFunc
 }
 
-func (r gorillaRouter) Run(cfg config.ServiceConfig) {
+func (r *gorillaRouter) Run(cfg models.ServiceConfig) {
 	r.cfg.Router.Use(r.cfg.Middlewares...)
 
-	// if r.cfg.HealthCheck{
-	// 	r.cfg.Router.Get("/__health", healthCheckHandler)
-	// }
+	if cfg.HealthCheck {
+		r.cfg.Router.HandleFunc("/__health", healthCheckHandler).Methods(http.MethodGet)
+	}
 
+	log.Infof("called registerEndpoints: %v", cfg.Endpoints)
 	r.registerEndpoints(cfg.Endpoints)
 
-	if err := r.serverRunner(r.ctx, cfg, r.cfg.Router); err != nil {
+	err := r.serverRunner(r.ctx, cfg, r.cfg.Router)
+	if err != nil {
 		slog.Error(err.Error())
 	}
 
 	slog.Info("server stopped!!")
 }
 
-func (r gorillaRouter) registerEndpoints(endpoints []*config.EndpointConfig) {
+func (r *gorillaRouter) Shutdown() {
+	r.cancelCtx() // Cancel the existing context
+}
+
+func (r gorillaRouter) registerEndpoints(endpoints []*models.EndpointConfig) {
 	for _, endpoint := range endpoints {
 		proxy, err := r.cfg.ProxyFactory.New(endpoint)
 		if err != nil {
@@ -60,11 +72,11 @@ func (r gorillaRouter) registerEndpoints(endpoints []*config.EndpointConfig) {
 	}
 }
 
-func (r gorillaRouter) registerEndpoint(endpoint *config.EndpointConfig, handler http.HandlerFunc) {
+func (r gorillaRouter) registerEndpoint(endpoint *models.EndpointConfig, handler http.HandlerFunc) {
 	path := endpoint.Endpoint
 	method := endpoint.Method
 
-	r.cfg.Router.HandleFunc(path, handler).Methods(method)
+	//r.cfg.Router.HandleFunc(path, handler).Methods(method)
 
 	switch method {
 	case http.MethodGet, http.MethodPost, http.MethodPut, http.MethodPatch, http.MethodDelete:
@@ -77,6 +89,12 @@ func (r gorillaRouter) registerEndpoint(endpoint *config.EndpointConfig, handler
 	log.Infof("registering endpoint {method=%s - path=%s}", method, path)
 }
 
+// func restartRouter(r *gorillaRouter, cfg models.ServiceConfig) {
+// 	log.Infoln("restrating router...")
+// 	r.cancelCtx()
+// 	r.Run(cfg)
+// }
+
 type factory struct {
 	cfg Config
 }
@@ -86,9 +104,11 @@ func (f factory) New() router.Router {
 }
 
 func (f factory) NewWithContext(ctx context.Context) router.Router {
-	return gorillaRouter{
+	ctx, cancel := context.WithCancel(ctx)
+	return &gorillaRouter{
 		cfg:          f.cfg,
 		ctx:          ctx,
+		cancelCtx:    cancel,
 		serverRunner: f.cfg.ServerRunner,
 	}
 }
@@ -105,11 +125,29 @@ func DefaultFactory(proxyFactory proxy.Factory) factory {
 	}
 }
 
+func (f *factory) AddMiddlewares(mds []router.MiddlewareFactory) {
+	for _, gmd := range mds {
+		md := gorillaMiddleware(gmd)
+		f.cfg.Middlewares = append(f.cfg.Middlewares, md)
+	}
+}
+
+func gorillaMiddleware(gmd router.MiddlewareFactory) gorilla.MiddlewareFunc {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(gmd(next.ServeHTTP))
+	}
+}
+
 func gorillaParamsExtractor(r *http.Request) map[string]string {
 	params := map[string]string{}
 	title := cases.Title(language.Und)
-	for key, value := range gorilla.Vars(r) {
-		params[title.String(key)] = value
+	queryParams := r.URL.Query()
+	for key, vals := range queryParams {
+		params[title.String(key)] = vals[0]
 	}
+
+	// for key, value := range gorilla.Vars(r) {
+	// 	params[title.String(key)] = value
+	// }
 	return params
 }

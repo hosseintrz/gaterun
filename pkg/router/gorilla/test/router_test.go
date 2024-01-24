@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hosseintrz/gaterun/config"
+	"github.com/hosseintrz/gaterun/config/models"
 	"github.com/hosseintrz/gaterun/pkg/proxy"
 	"github.com/hosseintrz/gaterun/pkg/router/gorilla"
 )
@@ -20,14 +20,14 @@ func TestDefaultRouter(t *testing.T) {
 
 	defaultPort := 8888
 
-	cfg := config.ServiceConfig{
-		Name: "test-config",
+	cfg := models.ServiceConfig{
+		Name: "test-models",
 		Port: defaultPort,
-		Endpoints: []*config.EndpointConfig{
+		Endpoints: []*models.EndpointConfig{
 			{
 				Endpoint: "/users/{id}",
 				Method:   "GET",
-				Backends: []*config.BackendConfig{
+				Backends: []*models.BackendConfig{
 					{},
 				},
 				Timeout: 5,
@@ -35,7 +35,7 @@ func TestDefaultRouter(t *testing.T) {
 			{
 				Endpoint: "/users",
 				Method:   "POST",
-				Backends: []*config.BackendConfig{
+				Backends: []*models.BackendConfig{
 					{},
 				},
 				Timeout: 5,
@@ -43,7 +43,7 @@ func TestDefaultRouter(t *testing.T) {
 			{
 				Endpoint: "/users/{id}",
 				Method:   "PUT",
-				Backends: []*config.BackendConfig{
+				Backends: []*models.BackendConfig{
 					{},
 				},
 				Timeout: 5,
@@ -51,7 +51,7 @@ func TestDefaultRouter(t *testing.T) {
 			{
 				Endpoint: "/user/{id}",
 				Method:   "PATCH",
-				Backends: []*config.BackendConfig{
+				Backends: []*models.BackendConfig{
 					{},
 				},
 				Timeout: 5,
@@ -59,7 +59,7 @@ func TestDefaultRouter(t *testing.T) {
 			{
 				Endpoint: "/users/{id}",
 				Method:   "DELETE",
-				Backends: []*config.BackendConfig{
+				Backends: []*models.BackendConfig{
 					{},
 				},
 				Timeout: 5,
