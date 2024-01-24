@@ -5,12 +5,12 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/hosseintrz/gaterun/config"
+	"github.com/hosseintrz/gaterun/config/models"
 )
 
 type Proxy func(context.Context, *Request) (*Response, error)
 
-type BackendProxyFactory func(cfg *config.BackendConfig) Proxy
+type BackendProxyFactory func(cfg *models.BackendConfig) Proxy
 
 func NoopProxy(_ context.Context, _ *Request) (*Response, error) {
 	return &Response{

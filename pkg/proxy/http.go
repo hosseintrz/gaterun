@@ -2,12 +2,15 @@ package proxy
 
 import (
 	"context"
+	"fmt"
 	"net/http"
+	"net/url"
 	"strconv"
 
-	"github.com/hosseintrz/gaterun/config"
+	"github.com/hosseintrz/gaterun/config/models"
 	"github.com/hosseintrz/gaterun/pkg/encoding"
 	"github.com/hosseintrz/gaterun/pkg/transport/http/client"
+	"github.com/sirupsen/logrus"
 )
 
 var httpProxy = CustomHTTPProxyFactory(client.DefaultHttpClientFactory{})
@@ -17,30 +20,31 @@ func DefaultHTTPProxyFactory(c *http.Client) BackendProxyFactory {
 }
 
 func CustomHTTPProxyFactory(cf client.HTTPClientFactory) BackendProxyFactory {
-	return func(cfg *config.BackendConfig) Proxy {
+	return func(cfg *models.BackendConfig) Proxy {
 		return NewHTTPProxy(cfg, cf)
 	}
 }
 
-func NewHTTPProxy(cfg *config.BackendConfig, cf client.HTTPClientFactory) Proxy {
+func NewHTTPProxy(cfg *models.BackendConfig, cf client.HTTPClientFactory) Proxy {
 	// return NewHTTPProxyWithHTTPExecutor(cfg, client.DefaultHTTPReqeustExecutor(cf), encoding.NewDecoderFactory(cfg.DecoderFactory))
 	return NewHTTPProxyWithHTTPExecutor(cfg, client.DefaultHTTPReqeustExecutor(cf), encoding.CustomDecoderFactory)
 
 }
 
-func NewHTTPProxyWithHTTPExecutor(cfg *config.BackendConfig, requestExecutor client.HTTPRequestExecutor, decoderFactory encoding.DecoderFactory) Proxy {
+func NewHTTPProxyWithHTTPExecutor(cfg *models.BackendConfig, requestExecutor client.HTTPRequestExecutor, decoderFactory encoding.DecoderFactory) Proxy {
 	responseParser := NewDefaultHTTPResponseParser(decoderFactory)
 	statusHandler := client.DefaultHTTPStatusHandler
 	return NewCustomHTTPProxy(cfg, requestExecutor, statusHandler, responseParser)
 }
 
 func NewCustomHTTPProxy(
-	cfg *config.BackendConfig,
+	cfg *models.BackendConfig,
 	reqExecutor client.HTTPRequestExecutor,
 	statusHandler client.HTTPStatusHandler,
 	responseParser HTTPResponseParser) Proxy {
 	return func(ctx context.Context, req *Request) (*Response, error) {
-		request, err := http.NewRequest(req.Method, req.URL.String(), req.Body)
+		url := createURL(req.URL)
+		request, err := http.NewRequest(req.Method, url, req.Body)
 		if err != nil {
 			return nil, err
 		}
@@ -60,10 +64,18 @@ func NewCustomHTTPProxy(
 			}
 		}
 
+		// q := req.Query
+		// for k, values := range q {
+		// 	q.Add(k, strings.Join(values, ","))
+		// }
+		request.URL.RawQuery = req.Query.Encode()
+
+		logrus.Infof("emit %s request to %s", req.Method, url)
 		response, err := reqExecutor.Execute(ctx, request)
 		if err != nil {
 			return nil, err
 		}
+		logrus.Infof("received response %v", response)
 
 		select {
 		case <-ctx.Done():
@@ -81,4 +93,8 @@ func NewCustomHTTPProxy(
 
 		return responseParser(ctx, response)
 	}
+}
+
+func createURL(url *url.URL) string {
+	return fmt.Sprintf("%s%s", url.Host, url.Path)
 }

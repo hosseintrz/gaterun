@@ -8,17 +8,19 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/hosseintrz/gaterun/pkg/api/admin/models"
 	"github.com/hosseintrz/gaterun/pkg/transport/http/server"
 )
 
 type Request struct {
-	Method  string
-	URL     *url.URL
-	Query   url.Values
-	Path    string
-	Body    io.ReadCloser
-	Params  map[string]string
-	Headers map[string][]string
+	Method    string
+	URL       *url.URL
+	Query     url.Values
+	Path      string
+	Body      io.ReadCloser
+	URLParams map[string]string
+	Params    map[string]string
+	Headers   map[string][]string
 }
 
 func (r *Request) Clone() *Request {
@@ -98,13 +100,13 @@ func CloneURL(u *url.URL) *url.URL {
 	return u2
 }
 
-type RequestBuilder func(req *http.Request, queryString, headersToSend []string) *Request
+type RequestBuilder func(req *http.Request, queryString, headersToSend models.StrArray, urlParams map[string]string) *Request
 
 type ParamExtractor func(r *http.Request) map[string]string
 
-func NewRequestBuilder(pe ParamExtractor) RequestBuilder {
-	return func(req *http.Request, queryString, headersToSend []string) *Request {
-		params := pe(req)
+func NewRequestBuilder(paramExtractor ParamExtractor) RequestBuilder {
+	return func(req *http.Request, queryString, headersToSend models.StrArray, urlParams map[string]string) *Request {
+		params := paramExtractor(req)
 		headers := make(map[string][]string, len(headersToSend)+3)
 
 		for _, key := range headersToSend {
@@ -139,11 +141,12 @@ func NewRequestBuilder(pe ParamExtractor) RequestBuilder {
 		return &Request{
 			Method: req.Method,
 			// URL:     req.URL,
-			Query:   query,
-			Path:    req.URL.Path,
-			Body:    req.Body,
-			Params:  params,
-			Headers: headers,
+			URLParams: urlParams,
+			Query:     query,
+			Path:      req.URL.Path,
+			Body:      req.Body,
+			Params:    params,
+			Headers:   headers,
 		}
 	}
 }
