@@ -30,7 +30,7 @@ func TestDefaultRouter(t *testing.T) {
 				Backends: []*models.BackendConfig{
 					{},
 				},
-				Timeout: 5,
+				Timeout: 1 * time.Second,
 			},
 			{
 				Endpoint: "/users",
@@ -38,7 +38,7 @@ func TestDefaultRouter(t *testing.T) {
 				Backends: []*models.BackendConfig{
 					{},
 				},
-				Timeout: 5,
+				Timeout: 1 * time.Second,
 			},
 			{
 				Endpoint: "/users/{id}",
@@ -46,7 +46,7 @@ func TestDefaultRouter(t *testing.T) {
 				Backends: []*models.BackendConfig{
 					{},
 				},
-				Timeout: 5,
+				Timeout: 1 * time.Second,
 			},
 			{
 				Endpoint: "/users/{id}",
@@ -54,7 +54,7 @@ func TestDefaultRouter(t *testing.T) {
 				Backends: []*models.BackendConfig{
 					{},
 				},
-				Timeout: 5,
+				Timeout: 1 * time.Second,
 			},
 			{
 				Endpoint: "/users/{id}",
@@ -62,7 +62,7 @@ func TestDefaultRouter(t *testing.T) {
 				Backends: []*models.BackendConfig{
 					{},
 				},
-				Timeout: 5,
+				Timeout: 1 * time.Second,
 			},
 		},
 	}
@@ -106,14 +106,14 @@ func TestDefaultRouter(t *testing.T) {
 		}
 
 		if cType := res.Header.Get("Content-Type"); cType != "application/json" {
-			t.Errorf("epxected application/json contentType but got: %s - addr: %s \n", cType, url)
+			t.Errorf("epxected application/json contentType but got: %s - addr: %s method: %s \n", cType, url, endpoint.Method)
 		}
 		if gateRunVersion := res.Header.Get("GATERUN"); gateRunVersion != "1.0" {
 			t.Errorf("expected gaterun version to be 1 but got %s - addr : %s\n", gateRunVersion, url)
 		}
 
 		if res.StatusCode != http.StatusOK {
-			t.Errorf("expected statusCode to be 200 but got %d - addr: %s\n", res.StatusCode, url)
+			t.Errorf("expected statusCode to be 200 but got %d - addr: %s method: %s\n", res.StatusCode, url, endpoint.Method)
 		}
 	}
 
